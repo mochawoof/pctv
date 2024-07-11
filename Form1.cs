@@ -9,9 +9,13 @@ namespace pctv
         private LibVLC libVLC;
         private MediaPlayer player;
 
-        private Parser parser;
+        //constants
         private int channelButtonHeight = 24;
         private string offId = "PCTV.OFF";
+        private string version = "0.1.1";
+
+        //parser may be null
+        private Parser parser;
 
         private int scrolledChannel;
         private string selectedChannelId;
@@ -21,6 +25,7 @@ namespace pctv
         public Window()
         {
             InitializeComponent();
+            this.Text = "PCTV v" + version;
             libVLC = new LibVLC();
             player = new MediaPlayer(libVLC);
             videoView.MediaPlayer = player;
@@ -72,9 +77,9 @@ namespace pctv
             toggleStatus(true, "Searching...");
             try
             {
+                parser = null;
                 parser = new Parser(Properties.Settings.Default.source);
                 toggleStatus(false);
-                rePopulateChannels();
             }
             catch (Exception ex)
             {
@@ -82,28 +87,32 @@ namespace pctv
                 toggleStatus(true, "No Signal!");
                 MessageBox.Show("Failed to find channels! Make sure you're connected to the Internet and your source is valid.", "Error");
             }
+            rePopulateChannels();
         }
 
         private void rePopulateChannels()
         {
             channelPanel.Controls.Clear();
             int maxChannels = channelPanel.Height / (channelButtonHeight + (3 * 2));
-            for (int i = scrolledChannel; i < scrolledChannel + maxChannels; i++)
+            if (parser != null)
             {
-                if (i < parser.channels.Count - 1)
+                for (int i = scrolledChannel; i < scrolledChannel + maxChannels; i++)
                 {
-                    Channel channel = parser.channels[i];
-                    Button newButton = new Button();
-                    newButton.Size = new Size(channelPanel.Width - (channelPanel.Margin.All * 2), channelButtonHeight);
-                    newButton.Margin = new Padding(3);
-                    newButton.AutoEllipsis = true;
-                    newButton.TextAlign = ContentAlignment.MiddleLeft;
-                    newButton.Click += onChannelClick;
+                    if (i < parser.channels.Count - 1)
+                    {
+                        Channel channel = parser.channels[i];
+                        Button newButton = new Button();
+                        newButton.Size = new Size(channelPanel.Width - (channelPanel.Margin.All * 2), channelButtonHeight);
+                        newButton.Margin = new Padding(3);
+                        newButton.AutoEllipsis = true;
+                        newButton.TextAlign = ContentAlignment.MiddleLeft;
+                        newButton.Click += onChannelClick;
 
-                    newButton.Tag = channel.id;
-                    newButton.Text = formatChannelTitle(channel);
+                        newButton.Tag = channel.id;
+                        newButton.Text = formatChannelTitle(channel);
 
-                    channelPanel.Controls.Add(newButton);
+                        channelPanel.Controls.Add(newButton);
+                    }
                 }
             }
         }

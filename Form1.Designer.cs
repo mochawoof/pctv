@@ -225,7 +225,7 @@
             ClientSize = new Size(984, 511);
             Controls.Add(tableLayoutPanel1);
             Name = "Window";
-            Text = "PCTV v0.1";
+            Text = "PCTV";
             FormClosing += Window_FormClosing;
             Shown += Window_Shown;
             Resize += Window_Resize;
