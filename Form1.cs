@@ -108,19 +108,6 @@ namespace pctv
             }
         }
 
-        private List<Channel> filterChannels(string filter)
-        {
-            List<Channel> channels = new List<Channel>(parser.channels);
-            for (int i=0; i < channels.Count; i++)
-            {
-                if (!Regex.Match(channels[i].title, filter).Success)
-                {
-                    channels.RemoveAt(i);
-                }
-            }
-            return channels;
-        }
-
         private int findChannelIndex(string id)
         {
             for (int i=0; i < parser.channels.Count; i++)
