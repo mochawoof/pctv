@@ -39,7 +39,9 @@
             favoritesButton = new Button();
             leftToolPanel = new FlowLayoutPanel();
             changeSourceButton = new Button();
-            channelButton = new Button();
+            channelLabelPanel = new TableLayoutPanel();
+            channelLabel = new Label();
+            channelIdBox = new TextBox();
             tableLayoutPanel1.SuspendLayout();
             videoPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)videoView).BeginInit();
@@ -47,6 +49,7 @@
             rightToolPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)volumeBar).BeginInit();
             leftToolPanel.SuspendLayout();
+            channelLabelPanel.SuspendLayout();
             SuspendLayout();
             // 
             // tableLayoutPanel1
@@ -58,7 +61,7 @@
             tableLayoutPanel1.Controls.Add(channelPanel, 0, 1);
             tableLayoutPanel1.Controls.Add(videoPanel, 1, 1);
             tableLayoutPanel1.Controls.Add(toolPanel, 1, 0);
-            tableLayoutPanel1.Controls.Add(channelButton, 0, 0);
+            tableLayoutPanel1.Controls.Add(channelLabelPanel, 0, 0);
             tableLayoutPanel1.Dock = DockStyle.Fill;
             tableLayoutPanel1.Location = new Point(0, 0);
             tableLayoutPanel1.Name = "tableLayoutPanel1";
@@ -178,14 +181,42 @@
             changeSourceButton.UseVisualStyleBackColor = true;
             changeSourceButton.Click += changeSourceButton_Click;
             // 
-            // channelButton
+            // channelLabelPanel
             // 
-            channelButton.Dock = DockStyle.Fill;
-            channelButton.Location = new Point(4, 4);
-            channelButton.Name = "channelButton";
-            channelButton.Size = new Size(194, 24);
-            channelButton.TabIndex = 7;
-            channelButton.UseVisualStyleBackColor = true;
+            channelLabelPanel.ColumnCount = 2;
+            channelLabelPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
+            channelLabelPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
+            channelLabelPanel.Controls.Add(channelLabel, 1, 0);
+            channelLabelPanel.Controls.Add(channelIdBox, 0, 0);
+            channelLabelPanel.Dock = DockStyle.Fill;
+            channelLabelPanel.Location = new Point(4, 4);
+            channelLabelPanel.Name = "channelLabelPanel";
+            channelLabelPanel.RowCount = 1;
+            channelLabelPanel.RowStyles.Add(new RowStyle());
+            channelLabelPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
+            channelLabelPanel.Size = new Size(194, 24);
+            channelLabelPanel.TabIndex = 7;
+            // 
+            // channelLabel
+            // 
+            channelLabel.AutoSize = true;
+            channelLabel.Dock = DockStyle.Fill;
+            channelLabel.Location = new Point(97, 0);
+            channelLabel.Margin = new Padding(0);
+            channelLabel.Name = "channelLabel";
+            channelLabel.Size = new Size(97, 24);
+            channelLabel.TabIndex = 7;
+            channelLabel.TextAlign = ContentAlignment.MiddleCenter;
+            // 
+            // channelIdBox
+            // 
+            channelIdBox.Dock = DockStyle.Fill;
+            channelIdBox.Location = new Point(0, 0);
+            channelIdBox.Margin = new Padding(0);
+            channelIdBox.Name = "channelIdBox";
+            channelIdBox.Size = new Size(97, 23);
+            channelIdBox.TabIndex = 8;
+            channelIdBox.TextAlign = HorizontalAlignment.Center;
             // 
             // Window
             // 
@@ -207,6 +238,8 @@
             rightToolPanel.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)volumeBar).EndInit();
             leftToolPanel.ResumeLayout(false);
+            channelLabelPanel.ResumeLayout(false);
+            channelLabelPanel.PerformLayout();
             ResumeLayout(false);
         }
 
@@ -222,7 +255,9 @@
         private FlowLayoutPanel rightToolPanel;
         private FlowLayoutPanel leftToolPanel;
         private Button changeSourceButton;
-        private Button channelButton;
         private Button favoritesButton;
+        private Label channelLabel;
+        private TableLayoutPanel channelLabelPanel;
+        private TextBox channelIdBox;
     }
 }

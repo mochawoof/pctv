@@ -144,7 +144,8 @@ namespace pctv
             if (id != offId)
             {
                 int index = findChannelIndex(id);
-                channelButton.Text = formatChannelTitle(parser.channels[index]);
+                channelLabel.Text = parser.channels[index].title;
+                channelIdBox.Text = parser.channels[index].id;
                 selectedChannelId = id;
                 toggleStatus(true, "Tuning...");
 
@@ -154,7 +155,8 @@ namespace pctv
             }
             else
             {
-                channelButton.Text = "";
+                channelLabel.Text = "";
+                channelIdBox.Text = "";
                 selectedChannelId = id;
                 playerStopAsync();
             }
