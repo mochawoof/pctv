@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LibVLCSharp.Shared;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -42,9 +43,7 @@ namespace pctv
                         if (previousLine.StartsWith("#EXTINF"))
                         {
                             string[] attr = previousLine.Split(",");
-                            Channel newChannel = new Channel();
-                            newChannel.url = line;
-                            newChannel.title = attr[attr.Length - 1];
+                            Channel newChannel = new Channel(attr[attr.Length - 1], line);
 
                             channels.Add(newChannel);
                         }
@@ -60,5 +59,11 @@ namespace pctv
         public string id;
         public string url;
         public string group;
+
+        public Channel(string title, string url)
+        {
+            this.title = title;
+            this.url = url;
+        }
     }
 }

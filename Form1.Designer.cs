@@ -28,6 +28,8 @@
         /// </summary>
         private void InitializeComponent()
         {
+            components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Window));
             tableLayoutPanel1 = new TableLayoutPanel();
             channelPanel = new FlowLayoutPanel();
             videoPanel = new Panel();
@@ -35,11 +37,14 @@
             videoView = new LibVLCSharp.WinForms.VideoView();
             toolPanel = new TableLayoutPanel();
             rightToolPanel = new FlowLayoutPanel();
-            volumeBar = new TrackBar();
-            favoritesButton = new Button();
-            leftToolPanel = new FlowLayoutPanel();
             changeSourceButton = new Button();
+            volumeBar = new TrackBar();
+            leftToolPanel = new FlowLayoutPanel();
+            allButton = new Button();
+            favoritesButton = new Button();
+            addFavoriteButton = new Button();
             channelLabel = new Label();
+            toolTip = new ToolTip(components);
             tableLayoutPanel1.SuspendLayout();
             videoPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)videoView).BeginInit();
@@ -55,6 +60,7 @@
             tableLayoutPanel1.ColumnCount = 2;
             tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 200F));
             tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle());
+            tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 20F));
             tableLayoutPanel1.Controls.Add(channelPanel, 0, 1);
             tableLayoutPanel1.Controls.Add(videoPanel, 1, 1);
             tableLayoutPanel1.Controls.Add(toolPanel, 1, 0);
@@ -128,8 +134,8 @@
             // 
             // rightToolPanel
             // 
+            rightToolPanel.Controls.Add(changeSourceButton);
             rightToolPanel.Controls.Add(volumeBar);
-            rightToolPanel.Controls.Add(favoritesButton);
             rightToolPanel.Dock = DockStyle.Fill;
             rightToolPanel.FlowDirection = FlowDirection.RightToLeft;
             rightToolPanel.Location = new Point(390, 0);
@@ -139,27 +145,32 @@
             rightToolPanel.TabIndex = 0;
             rightToolPanel.WrapContents = false;
             // 
+            // changeSourceButton
+            // 
+            changeSourceButton.Location = new Point(313, 3);
+            changeSourceButton.Name = "changeSourceButton";
+            changeSourceButton.Size = new Size(75, 23);
+            changeSourceButton.TabIndex = 0;
+            changeSourceButton.Text = "Source";
+            toolTip.SetToolTip(changeSourceButton, "Change playlist source");
+            changeSourceButton.UseVisualStyleBackColor = true;
+            changeSourceButton.Click += changeSourceButton_Click;
+            // 
             // volumeBar
             // 
-            volumeBar.Location = new Point(284, 3);
+            volumeBar.Location = new Point(203, 3);
             volumeBar.Maximum = 100;
             volumeBar.Name = "volumeBar";
             volumeBar.Size = new Size(104, 45);
             volumeBar.TabIndex = 0;
+            toolTip.SetToolTip(volumeBar, "Adjust volume");
             volumeBar.ValueChanged += volumeBar_ValueChanged;
-            // 
-            // favoritesButton
-            // 
-            favoritesButton.Location = new Point(203, 3);
-            favoritesButton.Name = "favoritesButton";
-            favoritesButton.Size = new Size(75, 23);
-            favoritesButton.TabIndex = 1;
-            favoritesButton.Text = "Favorites";
-            favoritesButton.UseVisualStyleBackColor = true;
             // 
             // leftToolPanel
             // 
-            leftToolPanel.Controls.Add(changeSourceButton);
+            leftToolPanel.Controls.Add(allButton);
+            leftToolPanel.Controls.Add(favoritesButton);
+            leftToolPanel.Controls.Add(addFavoriteButton);
             leftToolPanel.Dock = DockStyle.Fill;
             leftToolPanel.Location = new Point(0, 0);
             leftToolPanel.Margin = new Padding(0);
@@ -168,15 +179,38 @@
             leftToolPanel.TabIndex = 1;
             leftToolPanel.WrapContents = false;
             // 
-            // changeSourceButton
+            // allButton
             // 
-            changeSourceButton.Location = new Point(3, 3);
-            changeSourceButton.Name = "changeSourceButton";
-            changeSourceButton.Size = new Size(75, 24);
-            changeSourceButton.TabIndex = 0;
-            changeSourceButton.Text = "Source";
-            changeSourceButton.UseVisualStyleBackColor = true;
-            changeSourceButton.Click += changeSourceButton_Click;
+            allButton.Location = new Point(3, 3);
+            allButton.Name = "allButton";
+            allButton.Size = new Size(75, 23);
+            allButton.TabIndex = 2;
+            allButton.Text = "All";
+            toolTip.SetToolTip(allButton, "Show all channels");
+            allButton.UseVisualStyleBackColor = true;
+            allButton.Click += allButton_Click;
+            // 
+            // favoritesButton
+            // 
+            favoritesButton.Location = new Point(84, 3);
+            favoritesButton.Name = "favoritesButton";
+            favoritesButton.Size = new Size(75, 23);
+            favoritesButton.TabIndex = 1;
+            favoritesButton.Text = "Favorites";
+            toolTip.SetToolTip(favoritesButton, "Show favorite channels");
+            favoritesButton.UseVisualStyleBackColor = true;
+            favoritesButton.Click += favoritesButton_Click;
+            // 
+            // addFavoriteButton
+            // 
+            addFavoriteButton.Location = new Point(165, 3);
+            addFavoriteButton.Name = "addFavoriteButton";
+            addFavoriteButton.Size = new Size(49, 23);
+            addFavoriteButton.TabIndex = 3;
+            addFavoriteButton.Text = "+";
+            toolTip.SetToolTip(addFavoriteButton, "Favorite this channel");
+            addFavoriteButton.UseVisualStyleBackColor = true;
+            addFavoriteButton.Click += addFavoriteButton_Click;
             // 
             // channelLabel
             // 
@@ -194,10 +228,13 @@
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(984, 511);
             Controls.Add(tableLayoutPanel1);
+            Icon = (Icon)resources.GetObject("$this.Icon");
+            KeyPreview = true;
             Name = "Window";
             Text = "PCTV";
             FormClosing += Window_FormClosing;
             Shown += Window_Shown;
+            KeyUp += Window_KeyUp;
             Resize += Window_Resize;
             tableLayoutPanel1.ResumeLayout(false);
             tableLayoutPanel1.PerformLayout();
@@ -225,5 +262,8 @@
         private Button changeSourceButton;
         private Button favoritesButton;
         private Label channelLabel;
+        private Button allButton;
+        private ToolTip toolTip;
+        private Button addFavoriteButton;
     }
 }

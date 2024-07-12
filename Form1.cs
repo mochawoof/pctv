@@ -1,6 +1,10 @@
 using LibVLCSharp.Shared;
+using System;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
+using System.Security.Policy;
 using System.Text.RegularExpressions;
+using System.Threading.Channels;
 
 namespace pctv
 {
@@ -8,19 +12,19 @@ namespace pctv
     {
         private LibVLC libVLC;
         private MediaPlayer player;
-        
+
         //constants
         private int channelButtonHeight = 24;
         private string offUrl = "pctv://off";
-        private string version = "0.1.2";
+        private string version = "0.2";
 
         //parser may be null
         private Parser parser;
 
         private int scrolledChannel;
-        private string selectedChannelUrl;
+        private Channel selectedChannel;
 
-        private long channelLastSwitched = 0;
+        private bool favoritesOpen = false;
 
         public Window()
         {
@@ -71,8 +75,7 @@ namespace pctv
         private void reFindChannels()
         {
             scrolledChannel = 0;
-            selectedChannelUrl = offUrl;
-            switchChannel(selectedChannelUrl);
+            switchChannel(new Channel(null, offUrl));
 
             toggleStatus(true, "Searching...");
             try
@@ -94,34 +97,67 @@ namespace pctv
         {
             channelPanel.Controls.Clear();
             int maxChannels = channelPanel.Height / (channelButtonHeight + (3 * 2));
-            if (parser != null)
+            if (!favoritesOpen)
             {
+                if (parser != null)
+                {
+                    for (int i = scrolledChannel; i < scrolledChannel + maxChannels; i++)
+                    {
+                        if (i <= parser.channels.Count - 1)
+                        {
+                            Channel channel = parser.channels[i];
+                            newChannelButton(channel, channelPanel.Width, onChannelClick);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                //favorites are open
+                string[] favorites = Properties.Settings.Default.favorites.Split("\n");
+                bool favoritesValid = false;
+
                 for (int i = scrolledChannel; i < scrolledChannel + maxChannels; i++)
                 {
-                    if (i < parser.channels.Count - 1)
+                    if (i <= favorites.Length - 1)
                     {
-                        Channel channel = parser.channels[i];
-                        Button newButton = new Button();
-                        newButton.Size = new Size(channelPanel.Width - (channelPanel.Margin.All * 2), channelButtonHeight);
-                        newButton.Margin = new Padding(3);
-                        newButton.AutoEllipsis = true;
-                        newButton.TextAlign = ContentAlignment.MiddleLeft;
-                        newButton.Click += onChannelClick;
-
-                        newButton.Tag = channel.url;
-                        newButton.Text = channel.title;
-
-                        channelPanel.Controls.Add(newButton);
+                        string favorite = favorites[i];
+                        string[] pair = favorite.Split(",");
+                        if (pair.Length == 2)
+                        {
+                            favoritesValid = true;
+                            Channel channel = new Channel(pair[0], pair[1]);
+                            newChannelButton(channel, channelPanel.Width, onChannelClick);
+                        }
                     }
+                }
+
+                if (!favoritesValid && scrolledChannel == 0)
+                {
+                    channelLabel.Text = "You have no favorites!";
                 }
             }
         }
 
+        private void newChannelButton(Channel channel, int width, EventHandler func)
+        {
+            Button newButton = new Button();
+            newButton.Size = new Size(width - (channelPanel.Margin.All * 2), channelButtonHeight);
+            newButton.Margin = new Padding(3);
+            newButton.AutoEllipsis = true;
+            newButton.TextAlign = ContentAlignment.MiddleLeft;
+            newButton.Click += func;
+
+            newButton.Tag = channel.url;
+            newButton.Text = channel.title;
+            channelPanel.Controls.Add(newButton);
+        }
+
         private int findChannelIndex(string url)
         {
-            for (int i=0; i < parser.channels.Count; i++)
+            for (int i = 0; i < parser.channels.Count; i++)
             {
-                Channel channel= parser.channels[i];
+                Channel channel = parser.channels[i];
                 if (channel.url == url)
                 {
                     return i;
@@ -130,41 +166,78 @@ namespace pctv
             return -1;
         }
 
-        private void switchChannel(string url)
+        private void addFavorite(Channel channel)
         {
-            if (url != offUrl)
+            string[] favorites = Properties.Settings.Default.favorites.Split("\n");
+
+            if (selectedChannel.url == offUrl)
             {
-                int index = findChannelIndex(url);
-                channelLabel.Text = parser.channels[index].title;
-                selectedChannelUrl = url;
+                return;
+            }
+
+            //make sure favorite doesn't already exist
+            foreach (string favorite in favorites)
+            {
+                string[] pair = favorite.Split(",");
+                if (pair.Length == 2)
+                {
+                    if (pair[1] == channel.url)
+                    {
+                        return;
+                    }
+                }
+            }
+
+            string[] newFavorites = new string[favorites.Length + 1];
+            favorites.CopyTo(newFavorites, 0);
+            newFavorites[newFavorites.Length - 1] = channel.title + "," + channel.url;
+
+            Properties.Settings.Default.favorites = string.Join("\n", newFavorites);
+        }
+
+        private void toggleFavorites(bool on)
+        {
+            favoritesOpen = on;
+            scrolledChannel = 0;
+            channelLabel.Text = selectedChannel.title;
+            rePopulateChannels();
+        }
+
+        private void switchChannel(Channel channel)
+        {
+            if (channel.title == null)
+            {
+                channel.title = "";
+            }
+
+            channelLabel.Text = channel.title;
+            selectedChannel = channel;
+            if (channel.url != offUrl)
+            {
                 toggleStatus(true, "Tuning...");
 
-                channelLastSwitched = getEpoch();
-
-                player.Play(new Media(libVLC, parser.channels[index].url, FromType.FromLocation));
+                player.Play(new Media(libVLC, channel.url, FromType.FromLocation));
             }
             else
             {
-                channelLabel.Text = "";
-                selectedChannelUrl = url;
                 playerStopAsync();
             }
         }
 
-        private void toggleStatus(bool state, string message)
+        private void toggleStatus(bool on, string message)
         {
             if (statusLabel.InvokeRequired)
             {
                 statusLabel.Invoke(delegate
                 {
-                    toggleStatus(state, message);
+                    toggleStatus(on, message);
                 });
             }
             else
             {
                 statusLabel.Text = message;
                 centerStatusLabel();
-                statusLabel.Visible = state;
+                statusLabel.Visible = on;
             }
         }
 
@@ -184,13 +257,13 @@ namespace pctv
 
         private long getEpoch()
         {
-            return (long) (DateTime.UtcNow - DateTime.MinValue).TotalMilliseconds;
+            return (long)(DateTime.UtcNow - DateTime.MinValue).TotalMilliseconds;
         }
 
         private void onChannelClick(object sender, EventArgs e)
         {
             Button channel = (Button)sender;
-            switchChannel((string) channel.Tag);
+            switchChannel(new Channel(channel.Text, (string)channel.Tag));
         }
 
         private void Window_Resize(object sender, EventArgs e)
@@ -242,9 +315,10 @@ namespace pctv
         private void changeSourceButton_Click(object sender, EventArgs e)
         {
             InputDialog dialog = new InputDialog();
-            if (dialog.Show("Type the full master M3U8 URL to source from.", Properties.Settings.Default.source) == DialogResult.OK)
+            if (dialog.Show("Type a M3U8 master playlist URL for the channel list to source from.", Properties.Settings.Default.source) == DialogResult.OK)
             {
                 Properties.Settings.Default.source = dialog.input;
+                toggleFavorites(false);
                 reFindChannels();
             }
         }
@@ -254,6 +328,44 @@ namespace pctv
             //save settings
             Properties.Settings.Default.volume = volumeBar.Value;
             Properties.Settings.Default.Save();
+        }
+
+        private void favoritesButton_Click(object sender, EventArgs e)
+        {
+            toggleFavorites(true);
+        }
+
+        private void allButton_Click(object sender, EventArgs e)
+        {
+            toggleFavorites(false);
+        }
+
+        private void addFavoriteButton_Click(object sender, EventArgs e)
+        {
+            addFavorite(selectedChannel);
+        }
+
+        private void Window_KeyUp(object sender, KeyEventArgs e)
+        {
+            //handle debug menu
+            if (e.KeyCode == Keys.D && e.Control && e.Shift)
+            {
+                InputDialog inputDialog = new InputDialog();
+                DialogResult result = inputDialog.Show("Welcome to the debug menu! WARNING: Some debug commands could break your installation!", "",
+                    new string[] {"reset", "crash"}
+                );
+
+                string input = inputDialog.input.ToLower();
+                if (input == "reset")
+                {
+                    Properties.Settings.Default.Reset();
+                    reFindChannels();
+                }
+                else if (input == "crash")
+                {
+                    Process.GetCurrentProcess().Kill();
+                }
+            }
         }
     }
 }

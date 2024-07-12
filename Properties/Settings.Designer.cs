@@ -46,5 +46,17 @@ namespace pctv.Properties {
                 this["volume"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string favorites {
+            get {
+                return ((string)(this["favorites"]));
+            }
+            set {
+                this["favorites"] = value;
+            }
+        }
     }
 }

@@ -15,12 +15,18 @@ namespace pctv
 
         public string input = "";
 
-        public DialogResult Show(string prompt, string defaultInput)
+        public DialogResult Show(string prompt, string defaultInput, string[] suggestions)
         {
             promptLabel.Text = prompt;
             inputBox.Text = defaultInput;
+            inputBox.Items.AddRange(suggestions);
             this.ActiveControl = inputBox;
             return ShowDialog();
+        }
+
+        public DialogResult Show(string prompt, string defaultInput)
+        {
+            return Show(prompt, defaultInput, new string[0]);
         }
 
         private void InitializeComponent()
@@ -28,7 +34,7 @@ namespace pctv
             promptLabel = new Label();
             cancelButton = new Button();
             okButton = new Button();
-            inputBox = new TextBox();
+            inputBox = new ComboBox();
             SuspendLayout();
             // 
             // promptLabel
@@ -63,6 +69,7 @@ namespace pctv
             // inputBox
             // 
             inputBox.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            inputBox.FormattingEnabled = true;
             inputBox.Location = new Point(12, 51);
             inputBox.Name = "inputBox";
             inputBox.Size = new Size(260, 23);
@@ -83,13 +90,11 @@ namespace pctv
             StartPosition = FormStartPosition.CenterParent;
             Text = "Input";
             ResumeLayout(false);
-            PerformLayout();
         }
 
         private Label promptLabel;
         private Button cancelButton;
         private Button okButton;
-        private TextBox inputBox;
 
         private void okButton_Click(object sender, EventArgs e)
         {
@@ -97,5 +102,7 @@ namespace pctv
             input = inputBox.Text;
             this.Close();
         }
+
+        private ComboBox inputBox;
     }
 }
