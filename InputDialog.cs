@@ -79,7 +79,9 @@ namespace pctv
             Controls.Add(promptLabel);
             FormBorderStyle = FormBorderStyle.FixedToolWindow;
             Name = "InputDialog";
+            ShowInTaskbar = false;
             StartPosition = FormStartPosition.CenterParent;
+            Text = "Input";
             ResumeLayout(false);
             PerformLayout();
         }

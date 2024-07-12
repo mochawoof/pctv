@@ -8,17 +8,17 @@ namespace pctv
     {
         private LibVLC libVLC;
         private MediaPlayer player;
-
+        
         //constants
         private int channelButtonHeight = 24;
-        private string offId = "PCTV.OFF";
-        private string version = "0.1.1";
+        private string offUrl = "pctv://off";
+        private string version = "0.1.2";
 
         //parser may be null
         private Parser parser;
 
         private int scrolledChannel;
-        private string selectedChannelId;
+        private string selectedChannelUrl;
 
         private long channelLastSwitched = 0;
 
@@ -71,8 +71,8 @@ namespace pctv
         private void reFindChannels()
         {
             scrolledChannel = 0;
-            selectedChannelId = offId;
-            switchChannel(selectedChannelId);
+            selectedChannelUrl = offUrl;
+            switchChannel(selectedChannelUrl);
 
             toggleStatus(true, "Searching...");
             try
@@ -108,8 +108,8 @@ namespace pctv
                         newButton.TextAlign = ContentAlignment.MiddleLeft;
                         newButton.Click += onChannelClick;
 
-                        newButton.Tag = channel.id;
-                        newButton.Text = formatChannelTitle(channel);
+                        newButton.Tag = channel.url;
+                        newButton.Text = channel.title;
 
                         channelPanel.Controls.Add(newButton);
                     }
@@ -117,12 +117,12 @@ namespace pctv
             }
         }
 
-        private int findChannelIndex(string id)
+        private int findChannelIndex(string url)
         {
             for (int i=0; i < parser.channels.Count; i++)
             {
                 Channel channel= parser.channels[i];
-                if (channel.id == id)
+                if (channel.url == url)
                 {
                     return i;
                 }
@@ -130,19 +130,13 @@ namespace pctv
             return -1;
         }
 
-        private string formatChannelTitle(Channel channel)
+        private void switchChannel(string url)
         {
-            return "[" + channel.id + "] " + channel.title;
-        }
-
-        private void switchChannel(string id)
-        {
-            if (id != offId)
+            if (url != offUrl)
             {
-                int index = findChannelIndex(id);
+                int index = findChannelIndex(url);
                 channelLabel.Text = parser.channels[index].title;
-                channelIdBox.Text = parser.channels[index].id;
-                selectedChannelId = id;
+                selectedChannelUrl = url;
                 toggleStatus(true, "Tuning...");
 
                 channelLastSwitched = getEpoch();
@@ -152,8 +146,7 @@ namespace pctv
             else
             {
                 channelLabel.Text = "";
-                channelIdBox.Text = "";
-                selectedChannelId = id;
+                selectedChannelUrl = url;
                 playerStopAsync();
             }
         }
@@ -183,9 +176,10 @@ namespace pctv
         private void centerStatusLabel()
         {
             statusLabel.Location = new Point(
-                videoView.Location.X + (videoView.Width / 2) - (statusLabel.Width / 2),
+                statusLabel.Location.X,
                 videoView.Location.Y + (videoView.Height / 2) - (statusLabel.Height / 2)
             );
+            statusLabel.Width = videoView.Width;
         }
 
         private long getEpoch()

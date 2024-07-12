@@ -44,7 +44,6 @@ namespace pctv
                             string[] attr = previousLine.Split(",");
                             Channel newChannel = new Channel();
                             newChannel.url = line;
-                            newChannel.id = channels.Count.ToString();
                             newChannel.title = attr[attr.Length - 1];
 
                             channels.Add(newChannel);
