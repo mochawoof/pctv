@@ -1,4 +1,4 @@
-some sources you can use!
+some extra sources you can use!
 
 https://raw.githubusercontent.com/Free-TV/IPTV/master/playlist.m3u8
 https://tv.qoopit.io/c

@@ -1,4 +1,6 @@
-﻿namespace pctv
+﻿using pctv.controls;
+
+namespace pctv
 {
     partial class Window
     {
@@ -37,12 +39,12 @@
             videoView = new LibVLCSharp.WinForms.VideoView();
             toolPanel = new TableLayoutPanel();
             rightToolPanel = new FlowLayoutPanel();
-            changeSourceButton = new Button();
+            changeSourceButton = new ThemedButton();
             volumeBar = new TrackBar();
             leftToolPanel = new FlowLayoutPanel();
-            allButton = new Button();
-            favoritesButton = new Button();
-            addFavoriteButton = new Button();
+            allButton = new ThemedButton();
+            favoritesButton = new ThemedButton();
+            addFavoriteButton = new ThemedButton();
             channelLabel = new Label();
             toolTip = new ToolTip(components);
             tableLayoutPanel1.SuspendLayout();
@@ -147,6 +149,8 @@
             // 
             // changeSourceButton
             // 
+            changeSourceButton.BackColor = Color.LightGray;
+            changeSourceButton.FlatStyle = FlatStyle.Flat;
             changeSourceButton.Location = new Point(313, 3);
             changeSourceButton.Name = "changeSourceButton";
             changeSourceButton.Size = new Size(75, 23);
@@ -163,6 +167,7 @@
             volumeBar.Name = "volumeBar";
             volumeBar.Size = new Size(104, 45);
             volumeBar.TabIndex = 0;
+            volumeBar.TickFrequency = 10;
             toolTip.SetToolTip(volumeBar, "Adjust volume");
             volumeBar.ValueChanged += volumeBar_ValueChanged;
             // 
@@ -181,6 +186,8 @@
             // 
             // allButton
             // 
+            allButton.BackColor = Color.LightGray;
+            allButton.FlatStyle = FlatStyle.Flat;
             allButton.Location = new Point(3, 3);
             allButton.Name = "allButton";
             allButton.Size = new Size(75, 23);
@@ -192,6 +199,8 @@
             // 
             // favoritesButton
             // 
+            favoritesButton.BackColor = Color.LightGray;
+            favoritesButton.FlatStyle = FlatStyle.Flat;
             favoritesButton.Location = new Point(84, 3);
             favoritesButton.Name = "favoritesButton";
             favoritesButton.Size = new Size(75, 23);
@@ -203,6 +212,8 @@
             // 
             // addFavoriteButton
             // 
+            addFavoriteButton.BackColor = Color.LightGray;
+            addFavoriteButton.FlatStyle = FlatStyle.Flat;
             addFavoriteButton.Location = new Point(165, 3);
             addFavoriteButton.Name = "addFavoriteButton";
             addFavoriteButton.Size = new Size(49, 23);
@@ -259,11 +270,11 @@
         private TableLayoutPanel toolPanel;
         private FlowLayoutPanel rightToolPanel;
         private FlowLayoutPanel leftToolPanel;
-        private Button changeSourceButton;
-        private Button favoritesButton;
+        private ThemedButton changeSourceButton;
+        private ThemedButton favoritesButton;
         private Label channelLabel;
-        private Button allButton;
+        private ThemedButton allButton;
         private ToolTip toolTip;
-        private Button addFavoriteButton;
+        private ThemedButton addFavoriteButton;
     }
 }

@@ -1,4 +1,5 @@
 using LibVLCSharp.Shared;
+using pctv.controls;
 using System;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
@@ -8,7 +9,7 @@ using System.Threading.Channels;
 
 namespace pctv
 {
-    public partial class Window : Form
+    public partial class Window : ThemedForm
     {
         private LibVLC libVLC;
         private MediaPlayer player;
@@ -16,7 +17,7 @@ namespace pctv
         //constants
         private int channelButtonHeight = 24;
         private string offUrl = "pctv://off";
-        private string version = "0.2";
+        private string version = "0.2.1";
 
         //parser may be null
         private Parser parser;
@@ -88,7 +89,7 @@ namespace pctv
             {
                 Debug.WriteLine(ex.ToString());
                 toggleStatus(true, "No Signal!");
-                MessageBox.Show("Failed to find channels! Make sure you're connected to the Internet and your source is valid.", "Error");
+                MessageBox.Show("Failed to find channels! Make sure you're connected to the Internet and your source is valid.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             rePopulateChannels();
         }
@@ -141,7 +142,7 @@ namespace pctv
 
         private void newChannelButton(Channel channel, int width, EventHandler func)
         {
-            Button newButton = new Button();
+            ThemedButton newButton = new ThemedButton();
             newButton.Size = new Size(width - (channelPanel.Margin.All * 2), channelButtonHeight);
             newButton.Margin = new Padding(3);
             newButton.AutoEllipsis = true;
@@ -359,7 +360,8 @@ namespace pctv
                 if (input == "reset")
                 {
                     Properties.Settings.Default.Reset();
-                    reFindChannels();
+                    MessageBox.Show("Successfully reset settings!", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    Application.Exit();
                 }
                 else if (input == "crash")
                 {
